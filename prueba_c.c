@@ -55,6 +55,53 @@ void funcion_XOR_y_distancia(int array1[], int array2[], int array3[], int taman
         }
     }
 }
+//Calcula (x,y) del num
+void calc_puntos(int num, int n, int k, int puntos[]){
+    int aux_num = num;
+    int aux_n = n;
+    int i=aux_n-1;
+    int j;
+
+    while(aux_n > 0){
+        puntos[i]= aux_num%k;
+        aux_num = aux_num/k;
+        aux_n--;
+        i--;
+    }
+    printf(" [ ");
+    for(j=0; j<n; j++){
+        if(j == n-1){
+            printf("%d" , puntos[j]);
+        }else{
+            printf("%d, " ,puntos[j]);
+        }
+
+    }
+    printf(" ] ");
+
+}
+int calc_distancia(int reg_enc[], int distancia, int n){
+    int i;
+    for(i=0; i<n; i++){
+        distancia+= abs(reg_enc[i]);
+    }
+    return distancia;
+}
+void calc_reg_enc(int arr_origen[], int arr_destino[], int n, int reg_enc[]){
+    int i;
+    printf("\n");
+    printf("Registro de encaminamiento: [");
+    for(i=0; i<n; i++){
+        reg_enc[i] = arr_destino[i]-arr_origen[i];
+        if(i == n-1){
+            printf("%i ", reg_enc[i]);
+        }else{
+            printf("%i, ", reg_enc[i]);
+        }
+    }
+    printf(" ]\n");
+
+}
 
 void registro_enc_XOR(int array_origen[], int XOR[], int reg_enc[], int tamano, int *distancia){
 
@@ -63,7 +110,6 @@ void registro_enc_XOR(int array_origen[], int XOR[], int reg_enc[], int tamano, 
     int num=0;
     int z, num_origen;
     int i = tamano-1;
-    reg_enc[dist_aux+1];
 
     for(z = 0; z<tamano; z++){
         sig_array[z] = array_origen[z];
@@ -76,16 +122,8 @@ void registro_enc_XOR(int array_origen[], int XOR[], int reg_enc[], int tamano, 
         if(XOR[i] == 1 ){
             sig_array[i] = 1-sig_array[i];
             XOR[i] = 0;
-            //printf("XOR:       ");
-            //imprimir_binario(XOR, tamano);
-            //printf("\n");
-            //printf("Siguiente: ");
-            //imprimir_binario(sig_array, tamano);
-            //printf("\n");
-            //printf("-----------\n");
             num = binario_a_entero(sig_array, tamano);
             reg_enc[*distancia - dist_aux] = num;
-            //printf("%i ->", reg_enc[i]);
             dist_aux--;
         }
         i--;
@@ -104,7 +142,7 @@ void registro_enc_XOR(int array_origen[], int XOR[], int reg_enc[], int tamano, 
 int main(int argc, char* argv[]){
 
     const char* topologia_str[] = {"toro", "hipercubo", "malla"};
-    int dimensiones, nodos, anillos, origen, destino, nodos_total, bits, distancia;
+    int dimensiones, nodos, anillos, origen, destino, nodos_total, bits, distancia, d;
     bool a_anillos = false;
     int i;
 
@@ -133,6 +171,13 @@ int main(int argc, char* argv[]){
 
         nodos_total = pow(nodos, dimensiones);
         printf("%i-ary %i-%s: %i nodos en total\n", nodos, dimensiones, topologia_str[0], nodos_total);
+
+        printf("El paquete va de: %i ", origen);
+        int puntos1[dimensiones];
+        int puntos2[dimensiones];
+        calc_puntos(origen, dimensiones, nodos, puntos1);
+        printf("a %i", destino);
+        calc_puntos(destino, dimensiones, nodos, puntos2);
 
     }else if(a_anillos == false && nodos == 2 ){ //hipercubo
         nodos_total = pow(2, dimensiones);
@@ -176,9 +221,19 @@ int main(int argc, char* argv[]){
     }else{ // malla
         nodos_total = pow(nodos, dimensiones);
         printf("%i-ary %i-%s: %i nodos en total\n", nodos, dimensiones, topologia_str[2], nodos_total);
+        printf("El paquete va de: %i ", origen);
+        int puntos1[dimensiones];
+        int puntos2[dimensiones];
+        calc_puntos(origen, dimensiones, nodos, puntos1);
+        printf("a %i", destino);
+        calc_puntos(destino, dimensiones, nodos, puntos2);
+        int reg_enc[dimensiones];
+        calc_reg_enc(puntos1, puntos2, dimensiones, reg_enc);
+        distancia = calc_distancia(reg_enc, d, dimensiones);
+        printf("Distancia: %i ", distancia);
+
 
     }
-    //printf("El paquete va de %i a %i\n", origen, destino);
 
     return 0;
 }
