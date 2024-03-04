@@ -7,60 +7,95 @@
 int numero_de_bits(int nodos_total){
     int numero = nodos_total;
     int cont = 0;
-    int aux = 10000;
 
-    while (aux > 1){
-        aux = numero/2;
+    while (numero > 1) {
         cont++;
-        numero = aux;
-        if( aux == 1){
-            cont++;
-        }
+        numero = numero / 2;
     }
     return cont;
 }
 //Funcion que cuenta el numero de bits y el binario del numero
 void decimal_a_binario(int num, int array[], int tamano){
     int i, aux;
-    array[tamano];
+    //array[tamano];
     for(i = tamano-1; i>=0; i-- ){
         aux = num%2;
         array[i] = aux;
         num = num/2;
     }
 }
+
+void imprimir_binario(int array[], int tamano){
+    int i;
+    for(i = 0; i< tamano; i++){
+        printf("%i ", array[i]);
+    }
+}
 //NECESARIO?????????????
 int binario_a_entero(int array[], int tamano){
     int resultado = 0;
-    for(int i=0; i< tamano; i++){
-        resultado = (resultado << 1) | array[i];
+    int i;
+
+    for (i = tamano - 1; i >= 0; i--) {
+        if (array[i] == 1) {
+            resultado += pow(2, tamano - 1 - i);
+        }
     }
     return resultado;
 }
-
-void funcion_XOR(int array1[], int array2[], int array3[], int tamano){
+//Función que devuelve el XOR de dos arrays y su distancia
+void funcion_XOR_y_distancia(int array1[], int array2[], int array3[], int tamano, int *distancia){
 
     for(int i=0; i< tamano; i++){
         if(array1[i]!= array2[i]){
             array3[i] = 1;
+            (*distancia)++;
         }else{
             array3[i] = 0;
         }
     }
 }
-void registro_enc_XOR(int array_origen[], int XOR[], int camino[], int tamano){
-    int i,j, aux;
-    int num = 0;
-    for(i = tamano-1; i<=0; i--){
-        if(XOR[i] == 1){
-            array_origen[i] = 1:
+
+void registro_enc_XOR(int array_origen[], int XOR[], int reg_enc[], int tamano, int *distancia){
+
+    int dist_aux = *distancia;
+    int sig_array[tamano];
+    int num=0;
+    int z, num_origen;
+    int i = tamano-1;
+    reg_enc[dist_aux+1];
+
+    for(z = 0; z<tamano; z++){
+        sig_array[z] = array_origen[z];
+    }
+    num_origen = binario_a_entero(array_origen, tamano);
+    printf("%i ->", num_origen);
+    reg_enc[0] = num_origen;
+    while(dist_aux > 0 && i>=0){
+        num = 0;
+        if(XOR[i] == 1 ){
+            sig_array[i] = 1-sig_array[i];
             XOR[i] = 0;
-            for(j=tamano-1; j<=0; j--){
-                aux =
-                num += pow(2, j-)
-            }
+            //printf("XOR:       ");
+            //imprimir_binario(XOR, tamano);
+            //printf("\n");
+            //printf("Siguiente: ");
+            //imprimir_binario(sig_array, tamano);
+            //printf("\n");
+            //printf("-----------\n");
+            num = binario_a_entero(sig_array, tamano);
+            reg_enc[*distancia - dist_aux] = num;
+            //printf("%i ->", reg_enc[i]);
+            dist_aux--;
+        }
+        i--;
+    }
+    dist_aux = *distancia;
+    for(int j=0; j<dist_aux; j++){
+        if(j==dist_aux-1){
+            printf("%i ", reg_enc[j]);
         }else{
-            i--;
+            printf("%i->", reg_enc[j]);
         }
     }
 }
@@ -69,10 +104,10 @@ void registro_enc_XOR(int array_origen[], int XOR[], int camino[], int tamano){
 int main(int argc, char* argv[]){
 
     const char* topologia_str[] = {"toro", "hipercubo", "malla"};
-    int dimensiones, nodos, anillos, origen, destino, nodos_total, bits;
-    int distancia = 0;
+    int dimensiones, nodos, anillos, origen, destino, nodos_total, bits, distancia;
     bool a_anillos = false;
     int i;
+
 
     printf("Introduzca numero de dimensiones:\n");
     scanf("%i", &dimensiones);
@@ -103,7 +138,7 @@ int main(int argc, char* argv[]){
         nodos_total = pow(2, dimensiones);
         printf("%i-ary %i-%s: %i nodos en total\n", nodos, dimensiones, topologia_str[1], nodos_total);
         bits = numero_de_bits(nodos_total);
-        printf("Numero de bits: %i", bits);
+        printf("Numero de bits: %i\n", bits);
         int miArray1[bits];
         int miArray2[bits];
         int miarray3[bits];
@@ -122,14 +157,21 @@ int main(int argc, char* argv[]){
             printf("%i ", miArray2[i]);
         }
         printf("]\n");
+        funcion_XOR_y_distancia(miArray1, miArray2, miarray3, bits, &distancia);
+        printf("Distancia : %i\n", distancia);
+
+
         printf("Registro de encaminamiento: ");
         printf("[ ");
-        funcion_XOR(miArray1, miArray2, miarray3, bits);
+
 
         for(i = 0; i<bits; i++){
             printf("%i ", miarray3[i]);
         }
         printf("]\n");
+
+        int reg_enc[distancia];
+        registro_enc_XOR(miArray1, miarray3, reg_enc, bits, &distancia);
 
     }else{ // malla
         nodos_total = pow(nodos, dimensiones);
@@ -137,7 +179,6 @@ int main(int argc, char* argv[]){
 
     }
     //printf("El paquete va de %i a %i\n", origen, destino);
-    printf("Distancia: %i\n", distancia);
-    printf("Registro de encaminamiento\n");
+
     return 0;
 }
